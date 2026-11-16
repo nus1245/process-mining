@@ -170,7 +170,10 @@ v["swork"] = hrs(v.survey_complete, v.survey_start)
 v["r1work"] = hrs(v.rep1_complete, v.rep1_start)
 v["r2work"] = hrs(v.rep2_complete, v.rep2_start).fillna(0)
 v["r3work"] = hrs(v.rep3_complete, v.rep3_start).fillna(0)   # SQL L1264: rep3 작업 포함
+v["rwork"] = hrs(v.ticket_complete, v.ticket_start)           # 접수 MakeTicket 실작업
 tot, fld, rec, stl = v.total.mean(), v.fld.mean(), v.rec.mean(), v.stl.mean()
+rwork = v.rwork.mean()
+rwait = rec - rwork
 fwork = v.swork.mean() + v.r1work.mean() + v.r2work.mean() + v.r3work.mean()
 fwait = fld - fwork
 put("lead_total", tot, fmt(tot))
@@ -179,19 +182,24 @@ put("field_total", fld, fmt(fld))
 put("field_share", fld / tot * 100, fmt(fld / tot * 100))
 put("rec_total", rec, fmt(rec))
 put("rec_total_min", rec * 60, fmt(rec * 60))
+put("rec_work", rwork, fmt(rwork, 2))
+put("rec_work_min", rwork * 60, fmt(rwork * 60))
+put("rec_wait", rwait, fmt(rwait))
+put("rec_work_pct", rwork / rec * 100, fmt(rwork / rec * 100))
+put("rec_wait_pct", rwait / rec * 100, fmt(rwait / rec * 100))
 put("stl_total", stl, fmt(stl))
 check("lead_total", rnd(tot), 105.9, "SQL L1242", 0.05)
 check("field_total", rnd(fld), 98.3, "SQL L1243", 0.05)
 check("rec_total_min", rnd(rec * 60), 125.0, "SQL L875", 0.05)
-work_B = fwork + stl                       # 정의 B: 현장 실작업 + 정산 시스템 처리
+work_B = rwork + fwork + stl               # 실측 작업: 접수 MakeTicket + 현장 실작업 + 정산 시스템 처리
 wait_B = tot - work_B
 put("work_B", work_B, fmt(work_B))
 put("wait_B", wait_B, fmt(wait_B))
 put("wait_B_pct", wait_B / tot * 100, fmt(wait_B / tot * 100))
 put("work_B_pct", work_B / tot * 100, fmt(work_B / tot * 100))
 put("wait_fieldwork_only_pct", (tot - fwork) / tot * 100, fmt((tot - fwork) / tot * 100))
-check("wait_B_pct", rnd(wait_B / tot * 100), 90.5, "스토리보드 90.5% — 정의 B 재현")
-check("wait_B_h", rnd(wait_B), 95.8, "스토리보드 95.8h", 0.05)
+check("wait_B_pct", rnd(wait_B / tot * 100), 90.4, "원천 실측(MakeTicket 포함) 대기 비중 90.4%")
+check("wait_B_h", rnd(wait_B), 95.7, "원천 실측(MakeTicket 포함) 대기 95.7h", 0.05)
 put("field_work", fwork, fmt(fwork))
 put("field_wait", fwait, fmt(fwait))
 put("field_wait_pct", fwait / fld * 100, fmt(fwait / fld * 100))

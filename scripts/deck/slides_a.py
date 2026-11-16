@@ -82,7 +82,7 @@ def s02(doc, F):
 def s03(doc, F):
     sl = doc.new_slide(3, "Part 00")
     chrome(sl, sec_tag(3), f"총 리드타임의 {F('wait_B_pct')}%는 작업이 아닌 대기 시간이다",
-           source=f"대기 = 총 {F('lead_total')}h − 작업(현장 실작업 {F('field_work')}h + 정산 시스템 처리 {F('stl_total')}h) · 접수 구간은 전부 대기로 산정")
+           source=f"대기 = 총 {F('lead_total')}h − 작업(접수 티켓등록 {F('rec_work')}h + 현장 실작업 {F('field_work')}h + 정산 시스템 처리 {F('stl_total')}h)")
     banner = Card([label("THESIS · 통괄 가설"),
                    Txt([rich(f"수리 지연의 본질은 **공정 간 대기**와 **비실시간 접수의 소통 공백**이다. "
                              f"E2E 리드타임 {F('lead_total')}h 중 순수 대기가 {F('wait_B')}h.", 14, INK, accent=ACC)], name="thesis")],
@@ -109,7 +109,7 @@ def s03(doc, F):
     assert_body(sl, y + hh)
     sl.notes(f"핵심 가설은 명확합니다. 수리가 늦어지는 것은 기사가 느려서가 아니라 공정 사이의 대기와 접수 단계의 비동기 소통 지연 때문입니다. "
              f"전체 {F('lead_total')}시간 중 {F('wait_B')}시간({F('wait_B_pct')}%)이 대기입니다. "
-             f"[예상 질문] 90.5%의 정의는? → 작업을 현장 실작업({F('field_work')}h)과 정산 시스템 처리({F('stl_total')}h)로 보고 나머지를 대기로 산정했습니다. 현장 실작업만 작업으로 보면 대기 비중은 {F('wait_fieldwork_only_pct')}%입니다.")
+             f"[예상 질문] {F('wait_B_pct')}%의 정의는? → 작업을 접수 티켓등록({F('rec_work')}h), 현장 실작업({F('field_work')}h), 정산 시스템 처리({F('stl_total')}h)로 보고 나머지(접수 일정 조율 대기 {F('rec_wait')}h + 현장 대기 {F('field_wait')}h)를 대기로 산정했습니다. 현장 실작업만 작업으로 보면 대기 비중은 {F('wait_fieldwork_only_pct')}%입니다.")
     return sl
 
 
@@ -274,9 +274,9 @@ def s07(doc, F):
 def s08(doc, F):
     sl = doc.new_slide(8, "Part 02")
     chrome(sl, sec_tag(8), f"리드타임 {F('lead_total')}h의 {F('wait_B_pct')}%는 공정 간 대기",
-           sub=f"대기 = {F('lead_total')}h − 작업({F('field_work')}h 현장 실작업 + {F('stl_total')}h 정산 처리) = {F('wait_B')}h · 현장 국면이 대기의 {F('field_wait_of_all_wait_pct')}%",
-           source=f"출처: analysis.sql L1206~1395 · 접수 {F('rec_total')}h는 일정 조율 구간이 대부분이라 전부 대기로 산정(현장 실작업만 작업이면 {F('wait_fieldwork_only_pct')}%)")
-    chart = Card([cap("FIG.08", "3대 국면별 실작업 vs 단순 대기 (정정본)"),
+           sub=f"대기 = {F('lead_total')}h − 작업(접수 {F('rec_work')}h + 현장 {F('field_work')}h + 정산 {F('stl_total')}h) = {F('wait_B')}h · 현장 국면이 대기의 {F('field_wait_of_all_wait_pct')}%",
+           source=f"출처: analysis.sql L1206~1395 · 접수 {F('rec_total')}h = MakeTicket 실작업 {F('rec_work')}h({F('rec_work_pct')}%) + 일정 조율 대기 {F('rec_wait')}h({F('rec_wait_pct')}%)")
+    chart = Card([cap("FIG.08", "3대 국면별 실작업 vs 단순 대기"),
                   Img(os.path.join(DECK, "slide08_macro_leadtime_breakdown.png"), max_h=2.9, name="macro")], pad=0.14, gap=0.06, name="macro-card")
     cw_ = CW
     ch = chart.natural_h(cw_)

@@ -173,9 +173,9 @@ def render_p04_eda_missing():
 # -----------------------------------------------------------------------------
 def render_p08_leadtime_breakdown():
     phases = ["E2E 전체 총괄", "03 정산 국면", "02 현장 국면", "01 접수 국면"]
-    work_pct = [fs("work_B_pct"), 100.0, fs("field_work_pct"), 0.0]
-    wait_pct = [fs("wait_B_pct"), 0.0, fs("field_wait_pct"), 100.0]
-    wait_hours = [fs("wait_B"), 0.0, fs("field_wait"), fs("rec_total")]
+    work_pct = [fs("work_B_pct"), 100.0, fs("field_work_pct"), fs("rec_work_pct")]
+    wait_pct = [fs("wait_B_pct"), 0.0, fs("field_wait_pct"), fs("rec_wait_pct")]
+    wait_hours = [fs("wait_B"), 0.0, fs("field_wait"), fs("rec_wait")]
     hours_total = [fs("lead_total"), fs("stl_total"), fs("field_total"), fs("rec_total")]
 
     y = np.arange(len(phases))
